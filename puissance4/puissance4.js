@@ -192,16 +192,16 @@ class Puissance4 {
         }
         // Diagonal
         compter = 0;
-        let shift = ligne - colonne;
-        for (let i = Math.max(shift, 0); i < Math.min(this.lignes, this.colonnes + shift); i++) {
-            compter = (this.tableau[i][i - shift] === player) ? compter+1 : 0;
+        let diagonal = ligne - colonne;
+        for (let i = Math.max(diagonal, 0); i < Math.min(this.lignes, this.colonnes + diagonal); i++) {
+            compter = (this.tableau[i][i - diagonal] === player) ? compter+1 : 0;
             if (compter >= 4) return true;
         }
         // Anti-diagonal
         compter = 0;
-        shift = ligne + colonne;
-        for (let i = Math.max(shift - this.colonnes + 1, 0); i < Math.min(this.lignes, shift + 1); i++) {
-            compter = (this.tableau[i][shift - i] === player) ? compter+1 : 0;
+        diagonal = ligne + colonne;
+        for (let i = Math.max(diagonal - this.colonnes + 1, 0); i < Math.min(this.lignes, diagonal + 1); i++) {
+            compter = (this.tableau[i][diagonal - i] === player) ? compter+1 : 0;
             if (compter >= 4) return true;
         }
 
