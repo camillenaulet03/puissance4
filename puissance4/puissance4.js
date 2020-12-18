@@ -85,7 +85,7 @@ class Puissance4 {
     }
 
 
-    handle_click(event) {
+    handle_click(event,score1,score2) {
         //On vérifie si la partie est encore en cours
         if (this.gagnant !== null) {
             if (window.confirm("Fin de partie!\n\nVous voulez rejouez?")) {
@@ -123,11 +123,17 @@ class Puissance4 {
                     case 1:
                         window.alert("Joueur 1 gagne");
                         this.unwin = this.unwin + 1;
+                        score1 = document.getElementById("score1");
+                        score1.innerHTML = '';
+                        score1.append("Victoire de joueur 1 :"+this.unwin);
                         console.log(this.unwin);
                         break;
                     case 2:
                         window.alert("Joueur 2 gagne");
                         this.deuxwin = this.deuxwin + 1;
+                        score2 = document.getElementById("score2");
+                        score2.innerHTML = '';
+                        score2.append("Victoire de joueur 2 :"+this.deuxwin);
                         console.log(this.deuxwin);
                         break;
                     default:
