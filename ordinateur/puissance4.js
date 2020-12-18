@@ -5,6 +5,8 @@ class Puissance4 {
      */
     constructor(element_id, lignes=6, colonnes=7) {
         // On défini le nombre de lignes et de colonnes
+        this.unwin = 0;
+        this.deuxwin = 0;
         this.lignes = lignes;
         this.colonnes = colonnes;
         //On a un tableau qui définit l'état du jeu avec :
@@ -82,6 +84,7 @@ class Puissance4 {
             }
     }
 
+
     handle_click(event) {
         //On vérifie si la partie est encore en cours
         if (this.gagnant !== null) {
@@ -119,9 +122,13 @@ class Puissance4 {
                         break;
                     case 1:
                         window.alert("Joueur 1 gagne");
+                        this.unwin = this.unwin + 1;
+                        console.log(this.unwin);
                         break;
                     case 2:
                         window.alert("Joueur 2 gagne");
+                        this.deuxwin = this.deuxwin + 1;
+                        console.log(this.deuxwin);
                         break;
                     default:
                         if (this.tours === 2 && adversaire === "ordinateur") {
@@ -166,13 +173,13 @@ class Puissance4 {
         this.rendu();
         switch (this.gagnant) {
             case 0:
-                window.alert("Null game!!");
+                window.alert("Match nul!");
                 break;
             case 1:
-                window.alert("Player 1 wins");
+                window.alert("Joueur 1 gagne");
                 break;
             case 2:
-                window.alert("Player 2 wins");
+                window.alert("Joueur 2 gagne");
                 break;
         }
     }
