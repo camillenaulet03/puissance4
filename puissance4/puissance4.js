@@ -1,18 +1,17 @@
 class Puissance4 {
     /*
-      On initialise un plateau de jeu avec les dimensions `lignes` × `colonnes` (par défaut 6×7),
-      et on fait l'affichage dans l'élément `element_id` du DOM.
+      On initialise un plateau de 6 ligne et 7 colonnes
      */
     constructor(element_id, lignes=6, colonnes=7) {
-        // On défini le nombre de lignes et de colonnes
+        // On défini les scores à 0
         this.unwin = 0;
         this.deuxwin = 0;
+        // On défini le nombre de lignes et de colonnes
         this.lignes = lignes;
         this.colonnes = colonnes;
-        //On a un tableau qui définit l'état du jeu avec :
-        //   0: Comme case vide
-        //   1: Comme pion du joueur 1
-        //   2: Comme pion du joueur 2
+        //   0 = case vide
+        //   1 = pion du joueur 1
+        //   2 = pion du joueur 2
         this.tableau = Array(this.lignes);
         for (let i = 0; i < this.lignes; i++) {
             this.tableau[i] = Array(this.colonnes).fill(0);
@@ -21,17 +20,15 @@ class Puissance4 {
         this.tours = 1;
         // On a un nombre de coups joués
         this.coups = 0;
-        /* On a un entier indiquant le gagnant:
-            null: Alors la partie continue
-               0: Alors la partie est nulle
-               1: Alors joueur 1 a gagné
-               2: Alors joueur 2 a gagné
+        /* null = la partie continue
+               0 = la partie est nulle
+               1 = joueur 1 a gagné
+               2 = joueur 2 a gagné
         */
         this.gagnant = null;
 
         // On a l'élément du DOM où se fait l'affichage
         this.element = document.querySelector(element_id);
-        // On ajoute le gestionnaire d'événements pour gérer le click
         //On lance la fonction handle_click quand l'utilisateur click
         this.element.addEventListener('click', (event) => this.handle_click(event));
         // On fait l'affichage
@@ -64,26 +61,25 @@ class Puissance4 {
         this.coups++;
     }
 
-    /* Cette fonction ajoute un pion dans une colonne */
-    jouerHumain(colonne) {
-            /// On trouve la première case libre dans la colonne
-            let ligne;
-            for (let i = 0; i < this.lignes; i++) {
-                if (this.tableau[i][colonne] === 0) {
-                    ligne = i;
-                    break;
-                }
+    /* Ajouter un pion dans une colonne */
+    jouer(colonne) {
+        // On trouve la première case libre dans la colonne
+        let ligne;
+        for (let i = 0; i < this.lignes; i++) {
+            if (this.tableau[i][colonne] === 0) {
+                ligne = i;
+                break;
             }
-            if (ligne === undefined) {
-                return null;
-            } else {
-                //On effectue le coup
-                this.animation(ligne, colonne, this.tours);
-                //On renvois la ligne où on a joué
-                return ligne;
-            }
+        }
+        if (ligne === undefined) {
+            return null;
+        } else {
+            //On effectue le coup
+            this.animation(ligne, colonne, this.tours);
+            //On renvois la ligne où on a joué
+            return ligne;
+        }
     }
-
 
     handle_click(event) {
         //On vérifie si la partie est encore en cours
@@ -99,89 +95,52 @@ class Puissance4 {
         if (colonne !== undefined) {
             //On convertit les variables en entier avec parseInt pour ne pas avoir de problèmes
             colonne = parseInt(colonne);
-            let ligne = this.jouerHumain(parseInt(colonne));
+            let ligne = this.jouer(parseInt(colonne));
             if (ligne === null) {
                 window.alert("La colonne est pleine");
             } else {
-                // On vérifie s'il y a un gagnant, ou si la partie est finie
-                if (this.victoire(ligne, colonne, this.tours)) {
-                    this.gagnant = this.tours;
-                } else if (this.coups >= this.lignes * this.colonnes) {
-                    this.gagnant = 0;
-                }
-
-                this.changement();
-
-                //On met à jour l'affichage
-                this.rendu()
-
-                //On affiche le résultat
-                switch (this.gagnant) {
-                    case 0:
-                        window.alert("Match nul!");
-                        break;
-                    case 1:
-                        window.alert("Joueur 1 gagne");
-                        this.unwin = this.unwin + 1;
-                        console.log(this.unwin);
-                        break;
-                    case 2:
-                        window.alert("Joueur 2 gagne");
-                        this.deuxwin = this.deuxwin + 1;
-                        console.log(this.deuxwin);
-                        break;
-                    default:
-                        if (this.tours === 2 && adversaire === "ordinateur") {
-                            this.jouerOrdinateur();
-                        }
+                this.verificationGagnant(ligne, colonne);
+                if (this.tours === 2 && adversaire === "ordinateur") {
+                    this.jouerOrdinateur();
                 }
             }
         }
     }
 
-    verification(colonne) {
-        let ligne;
-        for (let i = 0; i < this.lignes; i++) {
-            if (this.tableau[i][colonne] === 0) {
-                ligne = i;
-                break;
-            }
+    verificationGagnant(ligne, colonne) {
+        // On vérifie s'il y a un gagnant, ou si la partie est finie
+        if (this.victoire(ligne, colonne, this.tours)) {
+            this.gagnant = this.tours;
+        } else if (this.coups >= this.lignes * this.colonnes) {
+            this.gagnant = 0;
         }
-        if (ligne === undefined) {
-            return null;
-        } else {
-            // Effectuer le coup
-            this.animation(ligne, colonne, this.tours);
-            // Renvoyer la ligne où on a joué
-            return ligne;
+        this.changement();
+        //on actualise le plateau
+        this.rendu();
+        //on regarde s'il ya un gagnant
+        switch (this.gagnant) {
+            case 0:
+                window.alert("Match nul!");
+                break;
+            case 1:
+                window.alert("Joueur 1 gagne");
+                break;
+            case 2:
+                window.alert("Joueur 2 gagne");
+                break;
         }
     }
 
     jouerOrdinateur() {
         let colonne;
         colonne = Math.floor(Math.random() * 7);
-        const ligne = this.verification(colonne);
+        //On vérifie si la colonne est pleine
+        const ligne = this.jouer(colonne);
         if (ligne === null) {
+            //L'ordinateur choisi une autre colonne
             this.jouerOrdinateur();
         } else {
-            if (this.victoire(ligne, colonne, this.tours)) {
-                this.gagnant = this.tours;
-            } else if (this.coups >= this.lignes * this.colonnes) {
-                this.gagnant = 0;
-            }
-            this.changement();
-            this.rendu();
-            switch (this.gagnant) {
-                case 0:
-                    window.alert("Match nul!");
-                    break;
-                case 1:
-                    window.alert("Joueur 1 gagne");
-                    break;
-                case 2:
-                    window.alert("Joueur 2 gagne");
-                    break;
-            }
+            this.verificationGagnant(ligne, colonne);
         }
     }
 
@@ -189,44 +148,39 @@ class Puissance4 {
     changement(){
         if (this.tours === 1) {
             this.tours = 2;
-        }else{
-            this.tours = 1;
         }
     }
 
     /*
-     Cette fonction vérifie si le coup dans la case `ligne`, `colonne` par
-     le joueur `player` est un coup gagnant.
-
-     Renvoie :
-       true  : si la partie est gagnée par le joueur `player`
-       false : si la partie continue
+     Vérifie si le joueur gagne.
+       true = si la partie est gagnée par le joueur `player`
+       false = si la partie continue
    */
     victoire(ligne, colonne, player) {
         // Horizontal
         let compter = 0;
         for (let j = 0; j < this.colonnes; j++) {
-            compter = (this.tableau[ligne][j] == player) ? compter+1 : 0;
+            compter = (this.tableau[ligne][j] === player) ? compter+1 : 0;
             if (compter >= 4) return true;
         }
         // Vertical
         compter = 0;
         for (let i = 0; i < this.lignes; i++) {
-            compter = (this.tableau[i][colonne] == player) ? compter+1 : 0;
+            compter = (this.tableau[i][colonne] === player) ? compter+1 : 0;
             if (compter >= 4) return true;
         }
         // Diagonal
         compter = 0;
         let shift = ligne - colonne;
         for (let i = Math.max(shift, 0); i < Math.min(this.lignes, this.colonnes + shift); i++) {
-            compter = (this.tableau[i][i - shift] == player) ? compter+1 : 0;
+            compter = (this.tableau[i][i - shift] === player) ? compter+1 : 0;
             if (compter >= 4) return true;
         }
         // Anti-diagonal
         compter = 0;
         shift = ligne + colonne;
         for (let i = Math.max(shift - this.colonnes + 1, 0); i < Math.min(this.lignes, shift + 1); i++) {
-            compter = (this.tableau[i][shift - i] == player) ? compter+1 : 0;
+            compter = (this.tableau[i][shift - i] === player) ? compter+1 : 0;
             if (compter >= 4) return true;
         }
 
@@ -248,6 +202,7 @@ class Puissance4 {
 // On initialise le plateau
 let p4 = new Puissance4('#game');
 
+//Vérifie par quoi fini l'url (humain, ordinateur)
 let adversaire;
 var value = document.location.href,
     params = value.split('?')[1].split('&'),
