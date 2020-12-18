@@ -163,24 +163,25 @@ class Puissance4 {
         const ligne = this.verification(colonne);
         if (ligne === null) {
             this.jouerOrdinateur();
-        }
-        if (this.victoire(ligne, colonne, this.tours)) {
-            this.gagnant = this.tours;
-        } else if (this.coups >= this.lignes * this.colonnes) {
-            this.gagnant = 0;
-        }
-        this.changement();
-        this.rendu();
-        switch (this.gagnant) {
-            case 0:
-                window.alert("Match nul!");
-                break;
-            case 1:
-                window.alert("Joueur 1 gagne");
-                break;
-            case 2:
-                window.alert("Joueur 2 gagne");
-                break;
+        } else {
+            if (this.victoire(ligne, colonne, this.tours)) {
+                this.gagnant = this.tours;
+            } else if (this.coups >= this.lignes * this.colonnes) {
+                this.gagnant = 0;
+            }
+            this.changement();
+            this.rendu();
+            switch (this.gagnant) {
+                case 0:
+                    window.alert("Match nul!");
+                    break;
+                case 1:
+                    window.alert("Joueur 1 gagne");
+                    break;
+                case 2:
+                    window.alert("Joueur 2 gagne");
+                    break;
+            }
         }
     }
 
