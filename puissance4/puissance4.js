@@ -101,14 +101,16 @@ class Puissance4 {
                 window.alert("La colonne est pleine");
             } else {
                 this.verificationGagnant(ligne, colonne);
-                if (this.tours === 2 && adversaire === "ordinateur") {
-                    this.jouerOrdinateur();
+                if (this.gagnant === null) {
+                    if (this.tours === 2 && adversaire === "ordinateur") {
+                        this.jouerOrdinateur();
+                    }
                 }
             }
         }
     }
 
-    verificationGagnant(ligne, colonne,score1,score2) {
+    verificationGagnant(ligne, colonne) {
         // On vérifie s'il y a un gagnant, ou si la partie est finie
         if (this.victoire(ligne, colonne, this.tours)) {
             this.gagnant = this.tours;
@@ -118,7 +120,7 @@ class Puissance4 {
         this.changement();
         //on actualise le plateau
         this.rendu();
-        //on regarde s'il ya un gagnant
+        //on regarde s'il y a un gagnant
         switch (this.gagnant) {
             case 0:
                 window.alert("Match nul!");
@@ -126,20 +128,25 @@ class Puissance4 {
             case 1:
                 window.alert("Joueur 1 gagne");
                 this.unwin = this.unwin + 1;
-                score1 = document.getElementById("score1");
-                score1.innerHTML = '';
-                score1.append("Victoire de joueur 1 :"+this.unwin);
-                console.log(this.unwin);
+                this.deuxwin = this.deuxwin + 0;
+                this.affichage();
                 break;
             case 2:
                 window.alert("Joueur 2 gagne");
                 this.deuxwin = this.deuxwin + 1;
-                score2 = document.getElementById("score2");
-                score2.innerHTML = '';
-                score2.append("Victoire de joueur 2 :"+this.deuxwin);
-                console.log(this.deuxwin);
+                this.unwin = this.unwin + 0;
+                this.affichage();
                 break;
         }
+    }
+
+    affichage(score1,score2) {
+        score1 = document.getElementById("score1");
+        score1.innerHTML = '';
+        score1.append("Victoire de joueur 1 : "+this.unwin);
+        score2 = document.getElementById("score2");
+        score2.innerHTML = '';
+        score2.append("Victoire de joueur 2 : "+this.deuxwin);
     }
 
     jouerOrdinateur() {
@@ -209,6 +216,7 @@ class Puissance4 {
         }
         this.coups = 0;
         this.gagnant = null;
+        this.tours = 1;
     }
 }
 
