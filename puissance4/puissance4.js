@@ -234,3 +234,9 @@ for (var i = 0, l = params.length; i < l; i++) {
     data[tmp[0]] = tmp[1];
 }
 adversaire = data.value;
+
+//Rejouer une partie
+function rejouer() {
+    p4.reinitialiser();
+    p4.rendu();
+}
