@@ -148,6 +148,8 @@ class Puissance4 {
     changement(){
         if (this.tours === 1) {
             this.tours = 2;
+        } else {
+            this.tours = 1;
         }
     }
 
@@ -211,4 +213,4 @@ for (var i = 0, l = params.length; i < l; i++) {
     tmp = params[i].split('=');
     data[tmp[0]] = tmp[1];
 }
-adversaire = document.getElementById('value').innerHTML = data.value;
+adversaire = data.value;
