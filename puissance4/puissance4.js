@@ -131,7 +131,7 @@ class Puissance4 {
                         console.log(this.deuxwin);
                         break;
                     default:
-                        if (this.tours === 2 && adversaire === "ordinateur") {
+                        if (this.tours === 2 && adversaire === "puissance4") {
                             this.jouerOrdinateur();
                         }
                 }
