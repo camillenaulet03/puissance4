@@ -1,189 +1,170 @@
-/***
-
- Solution du TD http://defeo.lu/aws/tutorials/tutorial2
-
- **/
-
 class Puissance4 {
     /*
-      Intialise un plateau de jeu de dimensions `rows` × `cols` (par défaut 6×7),
-      et fait l'affichage dans l'élément `element_id` du DOM.
+      On initialise un plateau de jeu avec les dimensions `lignes` × `colonnes` (par défaut 6×7),
+      et on fait l'affichage dans l'élément `element_id` du DOM.
      */
-    constructor(element_id, rows=6, cols=7) {
-        // Nombre de lignes et de colonnes
-        this.rows = rows;
-        this.cols = cols;
-        // cet tableau à deux dimensions contient l'état du jeu:
-        //   0: case vide
-        //   1: pion du joueur 1
-        //   2: pion du joueur 2
-        this.board = Array(this.rows);
-        for (let i = 0; i < this.rows; i++) {
-            this.board[i] = Array(this.cols).fill(0);
+    constructor(element_id, lignes=6, colonnes=7) {
+        // On défini le nombre de lignes et de colonnes
+        this.lignes = lignes;
+        this.colonnes = colonnes;
+        //On a un tableau qui définit l'état du jeu avec :
+        //   0: Comme case vide
+        //   1: Comme pion du joueur 1
+        //   2: Comme pion du joueur 2
+        this.tableau = Array(this.lignes);
+        for (let i = 0; i < this.lignes; i++) {
+            this.tableau[i] = Array(this.colonnes).fill(0);
         }
-        // un entier: 1 ou 2 (le numéro du prochain joueur)
-        this.turn = 1;
-        // Nombre de coups joués
-        this.moves = 0;
-        this.jouer = 1;
-        /* un entier indiquant le gagnant:
-            null: la partie continue
-               0: la partie est nulle
-               1: joueur 1 a gagné
-               2: joueur 2 a gagné
+        // On a un entier égale à 1 ou 2 (le numéro du prochain joueur)
+        this.tours = 1;
+        // On a un nombre de coups joués
+        this.coups = 0;
+        /* On a un entier indiquant le gagnant:
+            null: Alors la partie continue
+               0: Alors la partie est nulle
+               1: Alors joueur 1 a gagné
+               2: Alors joueur 2 a gagné
         */
-        this.winner = null;
-        // L'élément du DOM où se fait l'affichage
+        this.gagnant = null;
+
+        // On a l'élément du DOM où se fait l'affichage
         this.element = document.querySelector(element_id);
         // On ajoute le gestionnaire d'événements pour gérer le click
-        //
-        // Pour des raisons techniques, il est nécessaire de passer comme gestionnaire
-        // une fonction anonyme faisant appel à `this.handle_click`. Passer directement
-        // `this.handle_click` comme gestionnaire, sans wrapping, rendrait le mot clef
-        // `this` inutilisable dans le gestionnaire. Voir le "binding de this".
+        //On lance la fonction handle_click quand l'utilisateur click
         this.element.addEventListener('click', (event) => this.handle_click(event));
         // On fait l'affichage
-        this.render();
+        this.rendu();
     }
 
+
     /* Affiche le plateau de jeu dans le DOM */
-    render() {
+    rendu() {
         let table = document.createElement('table');
-        //ATTENTION, la page html est écrite de haut en bas. Les indices
-        //pour le jeu vont de bas en haut (compteur i de la boucle)
-        for (let i = this.rows - 1; i >= 0; i--) {
+        // La page html est écrite de haut en bas donc les indices pour le jeu vont de bas en haut (compteur i de la boucle)
+        for (let i = this.lignes - 1; i >= 0; i--) {
             let tr = table.appendChild(document.createElement('tr'));
-            for (let j = 0; j < this.cols; j++) {
+            for (let j = 0; j < this.colonnes; j++) {
                 let td = tr.appendChild(document.createElement('td'));
-                let colour = this.board[i][j];
-                if (colour)
-                    td.className = 'player' + colour;
-                td.dataset.column = j;
+                let couleur = this.tableau[i][j];
+                if (couleur)
+                    td.className = 'player' + couleur;
+                td.dataset.colonne = j;
             }
         }
         this.element.innerHTML = '';
         this.element.appendChild(table);
     }
 
-    set(row, column, player) {
+    animation(ligne, colonne, player) {
         // On colore la case
-        this.board[row][column] = player;
+        this.tableau[ligne][colonne] = player;
         // On compte le coup
-        this.moves++;
+        this.coups++;
     }
 
     /* Cette fonction ajoute un pion dans une colonne */
-    playHumain(column) {
-            // Trouver la première case libre dans la colonne
-            let row;
-            for (let i = 0; i < this.rows; i++) {
-                if (this.board[i][column] == 0) {
-                    row = i;
+    jouerHumain(colonne) {
+            /// On trouve la première case libre dans la colonne
+            let ligne;
+            for (let i = 0; i < this.lignes; i++) {
+                if (this.tableau[i][colonne] === 0) {
+                    ligne = i;
                     break;
                 }
             }
-            if (row === undefined) {
+            if (ligne === undefined) {
                 return null;
             } else {
-                // Effectuer le coup
-                this.set(row, column, this.turn);
-                // Renvoyer la ligne où on a joué
-                return row;
+                //On effectue le coup
+                this.animation(ligne, colonne, this.tours);
+                //On renvois la ligne où on a joué
+                return ligne;
             }
     }
 
     handle_click(event) {
-        // Vérifier si la partie est encore en cours
-        if (this.winner !== null) {
-            if (window.confirm("Game over!\n\nDo you want to restart?")) {
-                this.reset();
-                this.render();
+        //On vérifie si la partie est encore en cours
+        if (this.gagnant !== null) {
+            if (window.confirm("Fin de partie!\n\nVous voulez rejouez?")) {
+                this.reinitialiser();
+                this.rendu();
             }
             return;
         }
 
-        let column = event.target.dataset.column;
-        if (column !== undefined) {
-            //attention, les variables dans les datasets sont TOUJOURS
-            //des chaînes de caractères. Si on veut être sûr de ne pas faire de bêtise,
-            //il vaut mieux la convertir en entier avec parseInt
-            column = parseInt(column);
-            let row = this.playHumain(parseInt(column));
-            if (row === null) {
-                window.alert("Column is full!");
+        let colonne = event.target.dataset.colonne;
+        if (colonne !== undefined) {
+            //On convertit les variables en entier avec parseInt pour ne pas avoir de problèmes
+            colonne = parseInt(colonne);
+            let ligne = this.jouerHumain(parseInt(colonne));
+            if (ligne === null) {
+                window.alert("La colonne est pleine");
             } else {
-                // Vérifier s'il y a un gagnant, ou si la partie est finie
-                if (this.win(row, column, this.turn)) {
-                    this.winner = this.turn;
-                } else if (this.moves >= this.rows * this.columns) {
-                    this.winner = 0;
+                // On vérifie s'il y a un gagnant, ou si la partie est finie
+                if (this.victoire(ligne, colonne, this.tours)) {
+                    this.gagnant = this.tours;
+                } else if (this.coups >= this.lignes * this.colonnes) {
+                    this.gagnant = 0;
                 }
-                // Passer le tour : 3 - 2 = 1, 3 - 1 = 2
-                this.turn = 3 - this.turn;
 
-                // Mettre à jour l'affichage
-                this.render()
+                this.changement();
 
-                //Au cours de l'affichage, pensez eventuellement, à afficher un
-                //message si la partie est finie...
-                switch (this.winner) {
+                //On met à jour l'affichage
+                this.rendu()
+
+                //On affiche le résultat
+                switch (this.gagnant) {
                     case 0:
-                        window.alert("Null game!!");
+                        window.alert("Match nul!");
                         break;
                     case 1:
-                        window.alert("Player 1 wins");
+                        window.alert("Joueur 1 gagne");
                         break;
                     case 2:
-                        window.alert("Player 2 wins");
+                        window.alert("Joueur 2 gagne");
                         break;
                     default:
-                        console.log(this.turn);
-                        console.log(adversaire);
-                        if (this.turn === 2 && adversaire === "ordinateur") {
-                            this.playOrdinateur();
+                        if (this.tours === 2 && adversaire === "ordinateur") {
+                            this.jouerOrdinateur();
                         }
                 }
             }
         }
     }
 
-    verification(column) {
-        let row;
-        for (let i = 0; i < this.rows; i++) {
-            if (this.board[i][column] === 0) {
-                console.log(this.board[i][column]);
-                row = i;
+    verification(colonne) {
+        let ligne;
+        for (let i = 0; i < this.lignes; i++) {
+            if (this.tableau[i][colonne] === 0) {
+                ligne = i;
                 break;
             }
         }
-        if (row === undefined) {
+        if (ligne === undefined) {
             return null;
         } else {
             // Effectuer le coup
-            this.set(row, column, this.turn);
+            this.animation(ligne, colonne, this.tours);
             // Renvoyer la ligne où on a joué
-            return row;
+            return ligne;
         }
     }
 
-    playOrdinateur() {
-        let column;
-        column = Math.floor(Math.random() * 7);
-        const row = this.verification(column);
-        console.log(column);
-        console.log(row);
-        if (row === null) {;
-            this.playOrdinateur();
+    jouerOrdinateur() {
+        let colonne;
+        colonne = Math.floor(Math.random() * 7);
+        const ligne = this.verification(colonne);
+        if (ligne === null) {
+            this.jouerOrdinateur();
         }
-        console.log(row, column, this.turn);
-        if (this.win(row, column, this.turn)) {
-            this.winner = this.turn;
-        } else if (this.moves >= this.rows * this.columns) {
-            this.winner = 0;
+        if (this.victoire(ligne, colonne, this.tours)) {
+            this.gagnant = this.tours;
+        } else if (this.coups >= this.lignes * this.colonnes) {
+            this.gagnant = 0;
         }
-        this.turn = 3 - this.turn;
-        this.render();
-        switch (this.winner) {
+        this.changement();
+        this.rendu();
+        switch (this.gagnant) {
             case 0:
                 window.alert("Null game!!");
                 break;
@@ -196,59 +177,67 @@ class Puissance4 {
         }
     }
 
+    //Cette fonction est la pour définir le joueur qui joue
+    changement(){
+        if (this.tours === 1) {
+            this.tours = 2;
+        }else{
+            this.tours = 1;
+        }
+    }
+
     /*
-     Cette fonction vérifie si le coup dans la case `row`, `column` par
+     Cette fonction vérifie si le coup dans la case `ligne`, `colonne` par
      le joueur `player` est un coup gagnant.
 
      Renvoie :
        true  : si la partie est gagnée par le joueur `player`
        false : si la partie continue
    */
-    win(row, column, player) {
+    victoire(ligne, colonne, player) {
         // Horizontal
-        let count = 0;
-        for (let j = 0; j < this.cols; j++) {
-            count = (this.board[row][j] === player) ? count+1 : 0;
-            if (count >= 4) return true;
+        let compter = 0;
+        for (let j = 0; j < this.colonnes; j++) {
+            compter = (this.tableau[ligne][j] == player) ? compter+1 : 0;
+            if (compter >= 4) return true;
         }
         // Vertical
-        count = 0;
-        for (let i = 0; i < this.rows; i++) {
-            count = (this.board[i][column] === player) ? count+1 : 0;
-            if (count >= 4) return true;
+        compter = 0;
+        for (let i = 0; i < this.lignes; i++) {
+            compter = (this.tableau[i][colonne] == player) ? compter+1 : 0;
+            if (compter >= 4) return true;
         }
         // Diagonal
-        count = 0;
-        let shift = row - column;
-        for (let i = Math.max(shift, 0); i < Math.min(this.rows, this.cols + shift); i++) {
-            count = (this.board[i][i - shift] === player) ? count+1 : 0;
-            if (count >= 4) return true;
+        compter = 0;
+        let shift = ligne - colonne;
+        for (let i = Math.max(shift, 0); i < Math.min(this.lignes, this.colonnes + shift); i++) {
+            compter = (this.tableau[i][i - shift] == player) ? compter+1 : 0;
+            if (compter >= 4) return true;
         }
         // Anti-diagonal
-        count = 0;
-        shift = row + column;
-        for (let i = Math.max(shift - this.cols + 1, 0); i < Math.min(this.rows, shift + 1); i++) {
-            count = (this.board[i][shift - i] === player) ? count+1 : 0;
-            if (count >= 4) return true;
+        compter = 0;
+        shift = ligne + colonne;
+        for (let i = Math.max(shift - this.colonnes + 1, 0); i < Math.min(this.lignes, shift + 1); i++) {
+            compter = (this.tableau[i][shift - i] == player) ? compter+1 : 0;
+            if (compter >= 4) return true;
         }
 
         return false;
     }
 
     // Cette fonction vide le plateau et remet à zéro l'état
-    reset() {
-        for (let i = 0; i < this.rows; i++) {
-            for (let j = 0; j < this.cols; j++) {
-                this.board[i][j] = 0;
+    reinitialiser() {
+        for (let i = 0; i < this.lignes; i++) {
+            for (let j = 0; j < this.colonnes; j++) {
+                this.tableau[i][j] = 0;
             }
         }
-        this.move = 0;
-        this.winner = null;
+        this.coups = 0;
+        this.gagnant = null;
     }
 }
 
-// On initialise le plateau et on visualise dans le DOM
-// (dans la balise d'identifiant `game`).
+// On initialise le plateau
 let p4 = new Puissance4('#game');
 
 let adversaire;
