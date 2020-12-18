@@ -22,3 +22,6 @@
 #container {
     display:flex;
 }
+#game {
+    margin-right: 2%;
+}
