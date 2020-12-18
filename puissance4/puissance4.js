@@ -144,10 +144,10 @@ class Puissance4 {
     affichage(score1,score2) {
         score1 = document.getElementById("score1");
         score1.innerHTML = '';
-        score1.append("Victoire de joueur 1 : "+this.unwin);
+        score1.append("Victoire joueur 1 : "+this.unwin);
         score2 = document.getElementById("score2");
         score2.innerHTML = '';
-        score2.append("Victoire de joueur 2 : "+this.deuxwin);
+        score2.append("Victoire joueur 2 : "+this.deuxwin);
     }
 
     jouerOrdinateur() {
