@@ -6,6 +6,7 @@ class Puissance4 {
         // On défini les scores à 0
         this.unwin = 0;
         this.deuxwin = 0;
+        this.affichage();
         // On défini le nombre de lignes et de colonnes
         this.lignes = lignes;
         this.colonnes = colonnes;
