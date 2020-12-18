@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="adversaire">
+    <input type='radio' name='adversaire' value="humain" onclick="choix()">Humain<br><br>
+    <input type='radio' name='adversaire' value="ordinateur" onclick="choix()">Ordinateur
+</div>
+</body>
+</html>
+<script>
+function choix() {
+    let value;
+    value = document.querySelector('input[name="adversaire"]:checked').value;
+    window.location.href = "ordinateur/puissance4.html?value=" + value;
+}
+</script>
